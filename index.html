@@ -183,6 +183,23 @@
                 justify-content: center;
             }
         }
+
+        /* ===== Spell Cast Count 全球魔法累計表 ===== */
+        /* 數字表下緣與下方「Guocheng & Kuanying」那一行相距 10pt */
+        .spell-counter {
+            margin-bottom: 10pt;
+        }
+        /* 數字變動時的輕柔滾動淡入 */
+        @keyframes spellDigitPop {
+            0%   { transform: translateY(-35%); opacity: 0.15; }
+            100% { transform: translateY(0);    opacity: 1; }
+        }
+        .spell-digit-pop {
+            animation: spellDigitPop 0.35s ease-out;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .spell-digit-pop { animation: none; }
+        }
     </style>
     <script>
         // 初始化全域提交狀態變數，防止 iframe onload 觸發時 ReferenceError
@@ -567,6 +584,19 @@
 
     <!-- 頁尾 Footer -->
     <footer class="py-10 bg-morandi-bg border-t border-morandi-warm/15 text-center text-xs text-morandi-muted">
+        <!-- Spell Cast Count：全球魔法祝福累計表（6 位數，上限 100000） -->
+        <div id="spell-counter" class="spell-counter flex flex-col items-center" role="img" aria-label="Spell Cast Count: 0">
+            <div id="spell-digits" class="flex justify-center gap-1.5 sm:gap-2">
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+                <div class="timer-card rounded-xl w-9 sm:w-12 md:w-14 py-2 sm:py-3 flex items-center justify-center"><span class="spell-digit font-cormorant text-2xl sm:text-4xl md:text-5xl font-bold text-morandi-text">0</span></div>
+            </div>
+            <span class="font-cormorant uppercase tracking-widest text-morandi-muted mt-2" style="font-size:10pt;">Spell Cast Count</span>
+        </div>
+
         <p class="deco-line font-cormorant text-lg tracking-widest text-morandi-warm mb-1">
             <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/17.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:0s;">
             <span>Guocheng & Kuanying</span>
@@ -808,6 +838,151 @@
                 requestAnimationFrame(animate);
             }
             animate();
+        })();
+    </script>
+
+    <!-- Spell Cast Count：全球即時累計（Firebase Realtime Database REST + 即時串流） -->
+    <script>
+        (function () {
+            // ====== 設定 ======
+            // 貼上你的 Firebase Realtime Database 網址（結尾不要加斜線），例如：
+            //   https://your-project-default-rtdb.firebaseio.com
+            //   https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
+            const DB_URL = 'https://magic-spell-507f5-default-rtdb.asia-southeast1.firebasedatabase.app';
+            const PATH = '/spellCount.json';
+            const MAX = 100000;      // 累計上限
+            const FLUSH_MS = 250;    // 連點時，每 250 毫秒合併送出一次（畫面仍是每按一下立刻 +1）
+
+            const digitEls = Array.from(document.querySelectorAll('#spell-digits .spell-digit'));
+            const counterEl = document.getElementById('spell-counter');
+            const btn = document.getElementById('magic-couple-container');
+            if (!digitEls.length || !btn) return;
+
+            const base = DB_URL.replace(/\/+$/, '');
+            const enabled = /^https:\/\//.test(base);
+
+            let serverCount = 0;  // 伺服器上的最新數字
+            let shown = 0;        // 畫面顯示的數字（含本機剛按、尚未同步的次數）
+            let unsent = 0;       // 本機已按、尚未送出的次數
+            let flushTimer = null;
+
+            function render() {
+                const n = Math.min(Math.max(shown, 0), MAX);
+                const text = String(n).padStart(6, '0');
+                digitEls.forEach(function (el, i) {
+                    if (el.textContent !== text[i]) {
+                        el.textContent = text[i];
+                        el.classList.remove('spell-digit-pop');
+                        void el.offsetWidth; // 重新觸發動畫
+                        el.classList.add('spell-digit-pop');
+                    }
+                });
+                if (counterEl) counterEl.setAttribute('aria-label', 'Spell Cast Count: ' + n);
+            }
+
+            // 收到伺服器的最新數字（來自別人的點擊，或自己的點擊已確認）
+            function applyServer(v) {
+                if (v === null || v === undefined) v = 0;
+                if (typeof v !== 'number' || !isFinite(v)) return;
+                serverCount = v;
+                if (v > shown) { shown = v; render(); }
+            }
+
+            // ====== 送出（原子性 +n，多人同時按也不會互相蓋掉）======
+            async function flush() {
+                flushTimer = null;
+                if (unsent <= 0) return;
+                const n = unsent;
+                unsent = 0;
+                let ok = false;
+                for (let i = 0; i < 3 && !ok; i++) {
+                    try {
+                        const res = await fetch(base + PATH, {
+                            method: 'PUT',
+                            body: JSON.stringify({ '.sv': { increment: n } }),
+                            keepalive: true
+                        });
+                        if (res.ok) { ok = true; break; }
+                        if (res.status >= 400 && res.status < 500) break; // 被拒絕（例如已到上限），不重試
+                    } catch (e) { /* 網路問題，稍後重試 */ }
+                    await new Promise(function (r) { setTimeout(r, 800 * (i + 1)); });
+                }
+                if (!ok) {
+                    // 送不出去：把畫面退回伺服器實際的數字，避免顯示不實的累計
+                    shown = Math.max(serverCount, shown - n);
+                    render();
+                }
+            }
+
+            function scheduleFlush() {
+                if (flushTimer === null) flushTimer = setTimeout(flush, FLUSH_MS);
+            }
+
+            function flushNow() {
+                if (flushTimer !== null) { clearTimeout(flushTimer); }
+                flush();
+            }
+
+            // ====== 點擊魔法祝福：畫面立刻 +1，並同步到全球 ======
+            btn.addEventListener('click', function () {
+                if (!enabled) {
+                    if (!btn.dataset.warned) {
+                        btn.dataset.warned = '1';
+                        console.warn('[Spell Cast Count] 尚未設定 DB_URL，計數器未啟用。');
+                    }
+                    return;
+                }
+                if (shown >= MAX) return; // 已達 100000
+                shown += 1;
+                unsent += 1;
+                render();
+                scheduleFlush();
+            });
+
+            if (!enabled) return;
+
+            // ====== 即時接收：Server-Sent Events，失敗時自動改為輪詢備援 ======
+            let pollTimer = null;
+
+            async function pollOnce() {
+                try {
+                    const res = await fetch(base + PATH, { cache: 'no-store' });
+                    if (res.ok) applyServer(await res.json());
+                } catch (e) { /* 忽略，下次再試 */ }
+            }
+            function startPolling() {
+                if (pollTimer) return;
+                pollOnce();
+                pollTimer = setInterval(pollOnce, 4000);
+            }
+            function stopPolling() {
+                if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+            }
+
+            function connect() {
+                if (!('EventSource' in window)) { startPolling(); return; }
+                const es = new EventSource(base + PATH);
+                es.addEventListener('open', stopPolling);
+                const onData = function (e) {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg && msg.path === '/') applyServer(msg.data);
+                    } catch (err) { /* 忽略無法解析的訊息 */ }
+                };
+                es.addEventListener('put', onData);
+                es.addEventListener('patch', onData);
+                es.addEventListener('cancel', startPolling);
+                es.addEventListener('error', startPolling);
+            }
+            connect();
+            pollOnce(); // 先抓一次，讓數字最快出現
+
+            // 離開頁面前把尚未送出的次數送出；回到頁面時立刻更新數字
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden') flushNow();
+                else pollOnce();
+            });
+            window.addEventListener('pagehide', flushNow);
         })();
     </script>
 </body>
