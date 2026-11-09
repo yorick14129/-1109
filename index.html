@@ -102,14 +102,14 @@
         }
 
         /* ===== 裝飾小圖 01-17 ===== */
-        /* 尺寸：手機版 20pt、網頁版 40pt（以長邊為準，等比例縮放不變形） */
+        /* 尺寸：手機版 40pt、網頁版 80pt（以長邊為準，等比例縮放不變形） */
         :root {
-            --deco-size: 20pt;
+            --deco-size: 40pt;
             --deco-gap: 20pt;      /* 圖片與文字的距離 */
             --deco-gap-wide: 60pt; /* 日期與時間、儀式地點 專用距離 */
         }
         @media (min-width: 768px) {
-            :root { --deco-size: 40pt; }
+            :root { --deco-size: 80pt; }
         }
         .deco {
             display: block;
@@ -165,9 +165,25 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
-        /* 極窄螢幕（寬度 340px 以下）：縮小導覽列兩個連結的間距，避免圖片 07 碰到文字 */
-        @media (max-width: 339px) {
-            nav .space-x-6 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem !important; }
+        /* 桌機版：圖片 07 為 80pt，導覽列加高才不會讓圖片蓋到下方內容；
+           封面區塊的上方留白與錨點跳轉位置同步調整，讓導覽列不會蓋住文字 */
+        @media (min-width: 768px) {
+            nav > div.relative { height: 120px; }
+            nav + section.pt-16 { padding-top: 121px; }
+            #details, #rsvp { scroll-margin-top: 41px; }
+        }
+        /* 手機版封面：姓名文字疊在照片上，圖片 15、06 不佔列高，
+           這樣文字位置維持原樣，不會被往上推到照片中的人物與桌面物品上 */
+        div.absolute.inset-0 h1.deco-line .deco { margin-block: -20pt; }
+        /* 窄螢幕（寬度 370px 以下）：圖片 07 改放在 Logo 與連結之間的空白處正中央，避免碰到文字 */
+        @media (max-width: 370px) {
+            .deco-nav-center {
+                position: static;
+                transform: none;
+                flex: 1 1 auto;
+                display: flex;
+                justify-content: center;
+            }
         }
     </style>
     <script>
