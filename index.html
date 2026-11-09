@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國誠 & 冠瑩 證婚儀式邀請 | Wedding Invitation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cormorant Garamond & Noto Serif TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            warm: '#d4a373',
+                            warmDark: '#b88555',
+                            sage: '#8da399',
+                            sageLight: '#eef2f0',
+                            bg: '#fbf9f5',
+                            card: '#ffffff',
+                            text: '#4a4238',
+                            muted: '#8c8275'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', '"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Serif TC"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #fbf9f5;
+            color: #4a4238;
+        }
+        .font-cormorant {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        /* 玻璃擬態效果 */
+        .glass-nav {
+            background: rgba(251, 249, 245, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px -5px rgba(212, 163, 115, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+        }
+        /* 倒數計時器卡片微光陰影 */
+        .timer-card {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 25px rgba(212, 163, 115, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+        }
+        /* 防止防折行強制標籤 */
+        .no-wrap {
+            white-space: nowrap;
+            display: inline-block;
+        }
+        /* 隱藏 Chrome, Safari, Edge, Opera 數字輸入框箭頭 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* 隱藏 Firefox 數字輸入框箭頭 */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* 魔法特效 Canvas 樣式 */
+        #magic-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 懸浮魔法情侶按鈕動態 */
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: gentleFloat 4s ease-in-out infinite;
+        }
+
+        /* ===== 裝飾小圖 01-17 ===== */
+        /* 尺寸：手機版 20pt、網頁版 40pt（以長邊為準，等比例縮放不變形） */
+        :root {
+            --deco-size: 20pt;
+            --deco-gap: 20pt;      /* 圖片與文字的距離 */
+            --deco-gap-wide: 60pt; /* 日期與時間、儀式地點 專用距離 */
+        }
+        @media (min-width: 768px) {
+            :root { --deco-size: 40pt; }
+        }
+        .deco {
+            display: block;
+            flex-shrink: 0;
+            width: var(--deco-size);
+            height: var(--deco-size);
+            object-fit: contain;
+            pointer-events: none;   /* 不攔截點擊，不影響其他元件 */
+            user-select: none;
+            -webkit-user-drag: none;
+            will-change: transform;
+            /* 漂浮動畫：上下各 2pt，10 秒一個循環；各圖用 animation-delay 錯開起始時間 */
+            animation: decoFloat 10s infinite;
+        }
+        @keyframes decoFloat {
+            0%   { transform: translateY(0);    animation-timing-function: ease-out; }
+            25%  { transform: translateY(-2pt); animation-timing-function: ease-in-out; }
+            75%  { transform: translateY(2pt);  animation-timing-function: ease-in; }
+            100% { transform: translateY(0); }
+        }
+        /* 單行文字：左圖 + 文字 + 右圖 */
+        .deco-line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--deco-gap);
+            white-space: nowrap;
+        }
+        /* 多行文字區塊：左圖 + 文字區塊 + 右圖 */
+        .deco-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--deco-gap);
+        }
+        /* 文字右側 60pt */
+        .deco-right-wide {
+            display: flex;
+            align-items: center;
+            gap: var(--deco-gap-wide);
+        }
+        /* 文字正下方 20pt、置中 */
+        .deco-below {
+            display: flex;
+            justify-content: center;
+            margin-top: var(--deco-gap);
+        }
+        /* 導覽列正中央 */
+        .deco-nav-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        /* 極窄螢幕（寬度 340px 以下）：縮小導覽列兩個連結的間距，避免圖片 07 碰到文字 */
+        @media (max-width: 339px) {
+            nav .space-x-6 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem !important; }
+        }
+    </style>
+    <script>
+        // 初始化全域提交狀態變數，防止 iframe onload 觸發時 ReferenceError
+        window.submitted = false;
+    </script>
+</head>
+<body class="antialiased selection:bg-morandi-warm selection:text-white">
+
+    <!-- 魔法特效繪圖 Canvas Layer -->
+    <canvas id="magic-canvas"></canvas>
+
+    <!-- 頂端固定毛玻璃導覽列 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+        <div class="relative max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="font-cormorant text-2xl font-bold tracking-widest text-morandi-warm">
+                G & K
+            </a>
+            <!-- 圖片 07：導覽列兩段文字中間、網頁正中央 -->
+            <div class="deco-nav-center">
+                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/07.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-8.82s;">
+            </div>
+            <div class="flex space-x-6 text-xs md:text-sm tracking-widest font-medium">
+                <a href="#details" class="hover:text-morandi-warm transition-colors duration-200 py-1">證婚儀式</a>
+                <a href="#rsvp" class="hover:text-morandi-warm transition-colors duration-200 py-1">出席回函</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首頁全螢幕封面區塊 (圖片置於導覽列正下方，徹底不被遮擋) -->
+    <section class="relative pt-16 bg-morandi-bg">
+        <div class="relative w-full max-w-5xl mx-auto flex flex-col items-center justify-center overflow-hidden">
+
+            <!-- 電腦/網頁版專屬：文字在圖片上方獨立顯示 (不與圖片重疊) -->
+            <div class="hidden md:flex flex-col items-center justify-center text-center text-morandi-text z-10 px-4 py-12 animate-fade-in w-full">
+                <p class="font-cormorant italic text-2xl tracking-widest mb-3 text-morandi-warm font-bold">Wedding Invitation</p>
+                <h1 class="deco-line text-4xl lg:text-5xl font-bold tracking-wider mb-4 font-serif text-morandi-text">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-1.76s;">
+                    <span>黃國誠 <span class="font-cormorant font-light mx-2 text-morandi-warm no-underline">&amp;</span> 李冠瑩</span>
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-4.71s;">
+                </h1>
+                <p class="text-base tracking-widest max-w-md mx-auto leading-relaxed font-bold text-morandi-text">
+                    邀請您見證我們的重要時刻
+                </p>
+                <p class="mt-6 font-cormorant text-xl tracking-widest font-bold text-morandi-warmDark">
+                    2027 . 01 . 23
+                </p>
+            </div>
+
+            <!-- 手機版封面圖片 -->
+            <img src="https://i.postimg.cc/43HjNyFk/0M8A0844-fu-zhi.jpg"
+                 alt="Wedding Cover Mobile"
+                 class="block md:hidden w-full h-auto object-contain object-top" />
+
+            <!-- 電腦/網頁版封面圖片 (圖片寬度同網頁寬度，獨立接在上方文字下方) -->
+            <img src="https://i.postimg.cc/Gm5ZCGKJ/0M8A0844-fu-zhi.jpg"
+                 alt="Wedding Cover Desktop"
+                 class="hidden md:block w-full h-auto object-contain object-top" />
+
+            <!-- 手機版封面文字內容疊加 (僅在手機版顯示，位置微調往上移) -->
+            <div class="flex md:hidden absolute inset-0 flex-col items-center justify-end text-center text-morandi-text z-10 px-4 pb-20 animate-fade-in">
+                <p class="font-cormorant italic text-lg tracking-widest mb-2 text-morandi-warm font-bold">Wedding Invitation</p>
+                <h1 class="deco-line text-2xl font-bold tracking-wider mb-3 font-serif text-morandi-text">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-1.76s;">
+                    <span>黃國誠 <span class="font-cormorant font-light mx-2 text-morandi-warm no-underline">&amp;</span> 李冠瑩</span>
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-4.71s;">
+                </h1>
+                <p class="text-xs tracking-widest text-morandi-text max-w-md mx-auto leading-relaxed font-bold">
+                    邀請您見證我們的重要時刻
+                </p>
+                <p class="mt-4 font-cormorant text-base tracking-widest font-bold text-morandi-warmDark">
+                    2027 . 01 . 23
+                </p>
+            </div>
+
+            <!-- 向上箭頭示意 -->
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-morandi-muted/80 animate-bounce z-10">
+                <i class="fa-solid fa-chevron-down text-lg"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- 藝術感倒數計時器 (極重要) -->
+    <section class="py-16 px-4 bg-morandi-bg">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="deco-line font-cormorant text-2xl md:text-3xl tracking-widest text-morandi-warm uppercase mb-8">
+                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/02.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-8.24s;">
+                <span>Countdown</span>
+                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/10.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-1.18s;">
+            </h2>
+
+            <!-- 獨立白色微光卡片倒數器 -->
+            <div class="flex justify-center items-center gap-2 sm:gap-4 md:gap-6">
+                <!-- 天數 -->
+                <div class="timer-card rounded-2xl p-3 sm:p-5 w-20 sm:w-24 md:w-28 flex flex-col items-center">
+                    <span id="days" class="font-cormorant text-3xl sm:text-4xl md:text-5xl font-bold text-morandi-text">00</span>
+                    <span class="text-[10px] sm:text-xs text-morandi-muted mt-1 uppercase tracking-widest">Days</span>
+                </div>
+
+                <!-- 垂直細線 -->
+                <div class="h-10 w-px bg-morandi-warm/30"></div>
+
+                <!-- 時 -->
+                <div class="timer-card rounded-2xl p-3 sm:p-5 w-20 sm:w-24 md:w-28 flex flex-col items-center">
+                    <span id="hours" class="font-cormorant text-3xl sm:text-4xl md:text-5xl font-bold text-morandi-text">00</span>
+                    <span class="text-[10px] sm:text-xs text-morandi-muted mt-1 uppercase tracking-widest">Hours</span>
+                </div>
+
+                <!-- 垂直細線 -->
+                <div class="h-10 w-px bg-morandi-warm/30"></div>
+
+                <!-- 分 -->
+                <div class="timer-card rounded-2xl p-3 sm:p-5 w-20 sm:w-24 md:w-28 flex flex-col items-center">
+                    <span id="minutes" class="font-cormorant text-3xl sm:text-4xl md:text-5xl font-bold text-morandi-text">00</span>
+                    <span class="text-[10px] sm:text-xs text-morandi-muted mt-1 uppercase tracking-widest">Mins</span>
+                </div>
+
+                <!-- 垂直細線 -->
+                <div class="h-10 w-px bg-morandi-warm/30"></div>
+
+                <!-- 秒 -->
+                <div class="timer-card rounded-2xl p-3 sm:p-5 w-20 sm:w-24 md:w-28 flex flex-col items-center">
+                    <span id="seconds" class="font-cormorant text-3xl sm:text-4xl md:text-5xl font-bold text-morandi-text">00</span>
+                    <span class="text-[10px] sm:text-xs text-morandi-muted mt-1 uppercase tracking-widest">Secs</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 關於我們故事宣告 -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-2xl mx-auto text-center space-y-6">
+            <p class="text-sm md:text-base text-morandi-text leading-relaxed tracking-wider">
+                <span class="deco-line">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/12.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-9.41s;">
+                    <span>親愛的朋友們</span>
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/14.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-7.65s;">
+                </span><br>
+                很開心可以正式跟大家宣布：<br>
+                我們要結婚了！<br><br>
+                一直以來，許多重要的時刻，身邊都有你們的陪伴。<br>
+                在這個特別的日子裡，也希望能邀請你們一起來，見證我們人生中的下一個篇章。
+            </p>
+        </div>
+    </section>
+
+    <!-- 質感垂直 V-Card 婚禮細節卡片 -->
+    <section id="details" class="py-20 px-4 bg-morandi-bg">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <div class="deco-group">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/13.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-3.53s;">
+                    <div>
+                        <p class="font-cormorant text-sm uppercase tracking-widest text-morandi-sage">Wedding Information</p>
+                        <h2 class="text-2xl md:text-3xl font-bold text-morandi-text mt-1">證婚儀式</h2>
+                    </div>
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/05.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-0.59s;">
+                </div>
+                <div class="w-12 h-0.5 bg-morandi-warm mx-auto mt-4"></div>
+            </div>
+
+            <!-- V-Card 核心容器 (垂直上下佈局) -->
+            <div class="glass-card rounded-3xl p-6 md:p-10 border border-morandi-warm/20 space-y-8">
+                <!-- 時間與地點 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 border-b border-morandi-warm/10">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-morandi-sageLight flex items-center justify-center text-morandi-sage shrink-0">
+                            <i class="fa-regular fa-calendar-check text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="deco-right-wide">
+                                <h4 class="font-bold text-morandi-text text-base">日期與時間</h4>
+                                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/09.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-7.06s;">
+                            </div>
+                            <p class="text-xs text-morandi-muted mt-1 font-bold">2027 年 1 月 23 日 (星期六)</p>
+                            <p class="text-xs text-morandi-warm font-medium mt-1">
+                                10 : 30 入場 <br>
+                                10 : 50 儀式開始 <br>
+                                11 : 30 合影留念
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 儀式地點 -->
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-morandi-sageLight flex items-center justify-center text-morandi-sage shrink-0">
+                            <i class="fa-solid fa-location-dot text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="deco-right-wide">
+                                <h4 class="font-bold text-morandi-text text-base">儀式地點</h4>
+                                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/11.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-5.29s;">
+                            </div>
+                            <p class="text-xs text-morandi-muted mt-1 font-semibold">
+                                <a href="https://maps.app.goo.gl/CHjmJdgvqbwuyFBTA" target="_blank" rel="noopener noreferrer" class="hover:text-morandi-warm underline underline-offset-2 transition-colors">
+                                    格萊天漾大飯店 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                                </a>
+                            </p>
+                            <p class="text-xs text-morandi-muted font-medium">16F天際高空花園</p>
+                            <p class="text-xs text-morandi-muted mt-1 no-wrap">台北市萬華區艋舺大道101號</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 儀式溫馨提醒說明 (改至交通指引上方) -->
+                <div class="bg-morandi-sageLight/50 p-5 rounded-2xl text-xs md:text-sm text-morandi-text leading-relaxed space-y-3">
+                    <p>
+                        當天以證婚儀式為主，沒有另外安排午宴用餐，還請大家事先留意～
+                    </p>
+                    <p>
+                        儀式前後會準備迎賓酒水與一些小點，<br>
+                        希望大家可以輕鬆來、開心聚一聚！
+                    </p>
+                    <p class="text-morandi-warmDark font-semibold">
+                        另外，當天現場不收紅包 💌<br>
+                        我們更希望收到你們的笑容、祝福，以及一起度過這個時刻的回憶。
+                    </p>
+                </div>
+
+                <!-- 交通指引 (摺疊式面板 Accordion - 上下排列於溫馨提醒下方) -->
+                <div>
+                    <button id="accordion-toggle" onclick="toggleAccordion()" class="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-morandi-warm/20 text-morandi-text hover:bg-morandi-bg transition-colors duration-200">
+                        <span class="font-semibold text-sm flex items-center">
+                            <i class="fa-solid fa-route text-morandi-warm mr-2"></i> 交通指引 Transport Info
+                        </span>
+                        <i id="accordion-icon" class="fa-solid fa-chevron-down text-morandi-warm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content" class="hidden mt-3 p-5 bg-white/80 rounded-2xl border border-morandi-warm/10 text-xs md:text-sm text-morandi-text space-y-4">
+                        <div class="space-y-1">
+                            <p class="font-semibold text-morandi-warm">
+                                <i class="fa-solid fa-train-subway mr-1"></i> 捷運
+                            </p>
+                            <p class="pl-5 text-morandi-muted">
+                                板南線<span class="no-wrap font-medium">「龍山寺站」2號出口出站</span>，步行約 5 分鐘。
+                            </p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="font-semibold text-morandi-warm">
+                                <i class="fa-solid fa-train mr-1"></i> 台鐵
+                            </p>
+                            <p class="pl-5 text-morandi-muted">
+                                <span class="no-wrap font-medium">「萬華火車站」1號出口出站即達</span>。
+                            </p>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-morandi-warm/10">
+                            <p class="font-semibold text-morandi-warm">
+                                <i class="fa-solid fa-car mr-1"></i> 自駕
+                            </p>
+                            <p class="pl-5 text-morandi-muted">
+                                可至以下特約停車場停車，現場將提供停車折抵。
+                            </p>
+                            <div class="pl-5 space-y-3 pt-1 text-morandi-muted">
+                                <div>
+                                    <a href="https://maps.app.goo.gl/cpL1skBZPd4UhRH28" target="_blank" rel="noopener noreferrer" class="font-semibold text-morandi-text hover:text-morandi-warm underline underline-offset-2 transition-colors">
+                                        萬華車站地下停車場 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                                    </a>
+                                    <ul class="list-disc list-inside mt-1 space-y-0.5 text-xs">
+                                        <li>台北市萬華區西園路一段 306 巷 1 號 (距離10公尺)</li>
+                                        <li>入口位於星巴克艋舺門市旁巷子進入到底</li>
+                                        <li>東門出口(僅有電梯)即在後門入口；西門出口(樓梯/電梯均有)過馬路後，即可抵達本飯店</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <a href="https://maps.app.goo.gl/WA524CnQ1h4zonU28" target="_blank" rel="noopener noreferrer" class="font-semibold text-morandi-text hover:text-morandi-warm underline underline-offset-2 transition-colors">
+                                        凱達大飯店附屬停車塔 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                                    </a>
+                                    <ul class="list-disc list-inside mt-1 space-y-0.5 text-xs">
+                                        <li>臺北市萬華區艋舺大道 260 號 (距離400公尺)</li>
+                                        <li>入口位於艋舺大道260號，過馬路後步行至格萊正門入口</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <a href="https://maps.app.goo.gl/8KbJcgKVasSi4FUd9" target="_blank" rel="noopener noreferrer" class="font-semibold text-morandi-text hover:text-morandi-warm underline underline-offset-2 transition-colors">
+                                        莒光社宅地下停車場 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                                    </a>
+                                    <ul class="list-disc list-inside mt-1 space-y-0.5 text-xs">
+                                        <li>台北市萬華區萬大路26號B1-B4 (距離200公尺)</li>
+                                        <li>入口位於興寧路66號</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-morandi-warm/10 text-morandi-warmDark font-bold leading-relaxed">
+                            <i class="fa-solid fa-building-user mr-1 text-morandi-warm"></i>
+                            抵達地點後，請搭電梯至 13 樓飯店大廳，依櫃台指示轉搭專用電梯至 16 樓天際高空花園。
+                        </div>
+                        <!-- 圖片 01：上方文字的中央正下方 20pt -->
+                        <div class="deco-below" style="margin-top:20pt;">
+                            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/01.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-4.12s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 出席回函表單區塊 -->
+    <section id="rsvp" class="py-20 px-4 bg-white">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="deco-group">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/04.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-6.47s;">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-morandi-text mt-1">出席回函</h2>
+                        <p class="text-xs text-morandi-muted mt-2">請於 2026 年 12 月 1 日前填寫完成</p>
+                    </div>
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/16.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-5.88s;">
+                </div>
+                <div class="w-12 h-0.5 bg-morandi-warm mx-auto mt-4"></div>
+            </div>
+
+            <!-- 隱藏式 Iframe -->
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(window.submitted){showSuccessMessage();}"></iframe>
+
+            <!-- 提交表單 -->
+            <form action="https://docs.google.com/forms/d/e/1FAIpQLSfgyLj9LTmHVyY1k2ii5TpopJpJWqYbAZrutY0RXSZm1kG6sA/formResponse"
+                  method="POST"
+                  target="hidden_iframe"
+                  onsubmit="window.submitted=true;"
+                  class="glass-card rounded-3xl p-6 md:p-10 space-y-6 border border-morandi-warm/20">
+
+                <!-- 姓名 (NAME) -->
+                <div>
+                    <label class="block text-xs font-semibold text-morandi-text tracking-wider mb-2">
+                        姓名 <span class="font-cormorant text-morandi-warm font-normal text-sm ml-1">NAME</span> *
+                    </label>
+                    <input type="text" name="entry.1777311154" required placeholder="請輸入您的姓名"
+                           class="w-full px-4 py-3 rounded-xl bg-morandi-bg border border-morandi-warm/20 text-xs md:text-sm focus:outline-none focus:border-morandi-warm transition-colors">
+                </div>
+
+                <!-- 能否出席 (ATTENDANCE) -->
+                <div>
+                    <label class="block text-xs font-semibold text-morandi-text tracking-wider mb-2">
+                        能否出席 <span class="font-cormorant text-morandi-warm font-normal text-sm ml-1">ATTENDANCE</span> *
+                    </label>
+                    <select name="entry.1855448026" required
+                            class="w-full px-4 py-3 rounded-xl bg-morandi-bg border border-morandi-warm/20 text-xs md:text-sm focus:outline-none focus:border-morandi-warm transition-colors">
+                        <option value="" disabled selected>請選擇您的出席狀況</option>
+                        <option value="會！1/23 見！">會！1/23 見！</option>
+                        <option value="遺憾無法到場，但祝你們幸福 ♡">遺憾無法到場，但祝你們幸福 ♡</option>
+                    </select>
+                </div>
+
+                <!-- 出席人數 (NUMBER OF ATTENDEES - 改為數字輸入框) -->
+                <div>
+                    <label class="block text-xs font-semibold text-morandi-text tracking-wider mb-2">
+                        出席人數 <span class="font-cormorant text-morandi-warm font-normal text-sm ml-1">NUMBER OF ATTENDEES</span> *
+                    </label>
+                    <input type="number" min="0" name="entry.714510240" required placeholder="請輸入出席人數（如：1）"
+                           class="w-full px-4 py-3 rounded-xl bg-morandi-bg border border-morandi-warm/20 text-xs md:text-sm focus:outline-none focus:border-morandi-warm transition-colors">
+                </div>
+
+                <!-- 給新人的祝福 (BLESSING FOR THE COUPLE) -->
+                <div>
+                    <label class="block text-xs font-semibold text-morandi-text tracking-wider mb-2">
+                        給新人的祝福 <span class="font-cormorant text-morandi-warm font-normal text-sm ml-1">BLESSING FOR THE COUPLE</span>
+                    </label>
+                    <textarea name="entry.3839189" rows="4" placeholder="請寫下您想給我們的祝福..."
+                              class="w-full px-4 py-3 rounded-xl bg-morandi-bg border border-morandi-warm/20 text-xs md:text-sm focus:outline-none focus:border-morandi-warm transition-colors"></textarea>
+                </div>
+
+                <!-- 送出按鈕 -->
+                <button type="submit"
+                        class="w-full py-4 rounded-xl bg-morandi-warm hover:bg-morandi-warmDark text-white text-sm font-semibold tracking-widest transition-all duration-300 shadow-md">
+                    送出回函
+                </button>
+
+                <!-- 圖片 03：送出回函按鈕的中央正下方 20pt -->
+                <div class="deco-below" style="margin-top:20pt;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/03.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-2.35s;">
+                </div>
+            </form>
+
+            <!-- 成功訊息提示框 -->
+            <div id="success_message" class="hidden mt-6 p-6 rounded-2xl bg-morandi-sageLight text-morandi-text text-center border border-morandi-sage/30">
+                <i class="fa-solid fa-heart text-morandi-warm text-2xl mb-2"></i>
+                <h3 class="font-bold text-base">回函已順利送出！</h3>
+                <p class="text-xs text-morandi-muted mt-1">非常感謝您的回覆，期待與您相見！</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 Footer -->
+    <footer class="py-10 bg-morandi-bg border-t border-morandi-warm/15 text-center text-xs text-morandi-muted">
+        <p class="deco-line font-cormorant text-lg tracking-widest text-morandi-warm mb-1">
+            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/17.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:0s;">
+            <span>Guocheng & Kuanying</span>
+            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/08.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-2.94s;">
+        </p>
+        <p>2027.01.23 • Wedding Day</p>
+    </footer>
+
+    <!-- 右下角手繪魔法情侶懸浮元件 -->
+    <div id="magic-couple-container" class="fixed bottom-4 right-4 z-40 flex flex-col items-center cursor-pointer select-none group">
+        <!-- 「點擊發送魔法祝福」溫潤毛玻璃標籤 -->
+        <div class="mb-1.5 px-3 py-1 rounded-full text-[11px] md:text-xs font-semibold tracking-wider text-morandi-text bg-white/85 backdrop-blur-md border border-morandi-warm/30 shadow-md group-hover:scale-105 group-hover:bg-white transition-all duration-300 flex items-center space-x-1">
+            <i class="fa-solid fa-wand-magic-sparkles text-morandi-warm"></i>
+            <span>點擊發送魔法祝福</span>
+        </div>
+
+        <!-- 手繪魔法情侶圖片 -->
+        <div class="relative animate-float transition-transform duration-300 group-hover:scale-105">
+            <img src="https://i.postimg.cc/wxWB9Kdg/mo-fa-xing-guang-xia-de-shuang-ren-zhou-yu.png"
+                 alt="魔法星光下的雙人咒語"
+                 class="w-32 md:w-40 h-auto drop-shadow-lg object-contain pointer-events-none" />
+        </div>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // 1. 倒數計時器
+        function updateCountdown() {
+            const targetDate = new Date("2027-01-23T10:50:00").getTime();
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = String(days).padStart(2, '0');
+                document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+                document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+                document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById("days").innerText = "00";
+                document.getElementById("hours").innerText = "00";
+                document.getElementById("minutes").innerText = "00";
+                document.getElementById("seconds").innerText = "00";
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 2. 交通指引摺疊 Accordion
+        function toggleAccordion() {
+            const content = document.getElementById("accordion-content");
+            const icon = document.getElementById("accordion-icon");
+            if (content.classList.contains("hidden")) {
+                content.classList.remove("hidden");
+                icon.style.transform = "rotate(180deg)";
+            } else {
+                content.classList.add("hidden");
+                icon.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // 3. 表單成功送出反饋
+        function showSuccessMessage() {
+            const form = document.querySelector("form");
+            const successMsg = document.getElementById("success_message");
+            if(form && successMsg) {
+                form.reset();
+                form.classList.add("hidden");
+                successMsg.classList.remove("hidden");
+            }
+        }
+    </script>
+
+    <!-- 精細優雅金色微光特效 Canvas 與腳本 -->
+    <canvas id="magicCanvas" class="pointer-events-none fixed inset-0 z-[9999]"></canvas>
+    <script>
+        (function() {
+            const canvas = document.getElementById('magicCanvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = [];
+
+            // 純淨奢華高質感金色調 (無咖啡色、無粉色)
+            const goldColors = [
+                '#FFE89C', // 亮星金
+                '#F3D075', // 暖香檳金
+                '#E5B842', // 曜金
+                '#FFF4CE'  // 白金微光
+            ];
+
+            // 粒子類別
+            class MagicParticle {
+                constructor(x, y, isSparkle = false) {
+                    this.x = x;
+                    this.y = y;
+                    this.isSparkle = isSparkle;
+                    // 更小更細緻的尺寸 (0.8px ~ 2.5px)
+                    this.size = isSparkle ? (Math.random() * 2.5 + 1.5) : (Math.random() * 1.8 + 0.8);
+                    this.color = goldColors[Math.floor(Math.random() * goldColors.length)];
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.015 + 0.012; // 緩慢自然優雅淡出
+                    this.vx = (Math.random() - 0.5) * 0.8;
+                    this.vy = (Math.random() - 0.5) * 0.8 - 0.2;
+                    this.rotation = Math.random() * Math.PI;
+                    this.rotSpeed = (Math.random() - 0.5) * 0.05;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.rotation += this.rotSpeed;
+                    this.alpha -= this.decay;
+                }
+
+                draw() {
+                    if (this.alpha <= 0) return;
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.translate(this.x, this.y);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 4; // 柔和微光 glow
+
+                    if (this.isSparkle) {
+                        // 四角細緻星芒
+                        ctx.rotate(this.rotation);
+                        ctx.beginPath();
+                        const s = this.size * 1.5;
+                        ctx.moveTo(0, -s);
+                        ctx.quadraticCurveTo(0, 0, s, 0);
+                        ctx.quadraticCurveTo(0, 0, 0, s);
+                        ctx.quadraticCurveTo(0, 0, -s, 0);
+                        ctx.quadraticCurveTo(0, 0, 0, -s);
+                        ctx.closePath();
+                        ctx.fill();
+                    } else {
+                        // 超細小圓點
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            // 滑鼠軌跡：控制產生頻率 (防止過於擁擠)
+            let lastX = 0;
+            let lastY = 0;
+            let lastTime = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                const now = Date.now();
+                const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+
+                // 距離需移動超過 15px 或間隔 > 50ms 才產生粒子，確保疏密極其優雅
+                if (dist > 15 || now - lastTime > 50) {
+                    // 每次移動僅隨機生成 1~2 個極細微粒
+                    const isSparkle = Math.random() < 0.35;
+                    particles.push(new MagicParticle(e.clientX, e.clientY, isSparkle));
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                    lastTime = now;
+                }
+            });
+
+            // 觸控支援 (手機版)
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const now = Date.now();
+                    const dist = Math.hypot(touch.clientX - lastX, touch.clientY - lastY);
+                    if (dist > 18 || now - lastTime > 60) {
+                        particles.push(new MagicParticle(touch.clientX, touch.clientY, Math.random() < 0.3));
+                        lastX = touch.clientX;
+                        lastY = touch.clientY;
+                        lastTime = now;
+                    }
+                }
+            }, { passive: true });
+
+            // 點擊時噴發精緻微小的金色法陣微粒
+            window.addEventListener('click', (e) => {
+                const count = 12; // 溫和不擁擠的點擊數量
+                for (let i = 0; i < count; i++) {
+                    const p = new MagicParticle(e.clientX, e.clientY, i % 2 === 0);
+                    const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.2);
+                    const speed = Math.random() * 1.5 + 0.8;
+                    p.vx = Math.cos(angle) * speed;
+                    p.vy = Math.sin(angle) * speed;
+                    particles.push(p);
+                }
+            });
+
+            // 右下角魔法情侶專屬點擊爆發效果
+            const coupleContainer = document.getElementById('magic-couple-container');
+            if (coupleContainer) {
+                coupleContainer.addEventListener('click', (e) => {
+                    e.stopPropagation(); // 阻止重複觸發預設點擊
+
+                    // 在螢幕正中央綻放細碎、細緻且氣勢盛大的純金色系星芒與微粒大煙火
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+
+                    const count = 140; // 140 顆細碎細緻微粒大煙火
+                    for (let i = 0; i < count; i++) {
+                        const p = new MagicParticle(centerX, centerY, i % 2 === 0);
+                        const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.4 - 0.2);
+                        const speed = Math.random() * 6.5 + 1.5; // 多層次擴散速度
+                        p.vx = Math.cos(angle) * speed;
+                        p.vy = Math.sin(angle) * speed;
+                        p.decay = Math.random() * 0.008 + 0.005; // 極致細膩長時間飄逸淡出
+                        p.size = i % 2 === 0 ? (Math.random() * 2.8 + 1.2) : (Math.random() * 1.5 + 0.6); // 細碎精緻
+                        particles.push(p);
+                    }
+                });
+            }
+
+            // 動畫循環
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].alpha <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+    </script>
+</body>
+</html>
