@@ -102,14 +102,14 @@
         }
 
         /* ===== 裝飾小圖 01-17 ===== */
-        /* 尺寸：手機版 40pt、網頁版 80pt（以長邊為準，等比例縮放不變形） */
+        /* 尺寸放大：手機版由 36pt 再調大至 42pt；06 與 15 圖示保持 36pt；網頁版保持 52pt 不變 */
         :root {
-            --deco-size: 40pt;
+            --deco-size: 42pt;
             --deco-gap: 20pt;      /* 圖片與文字的距離 */
             --deco-gap-wide: 60pt; /* 日期與時間、儀式地點 專用距離 */
         }
         @media (min-width: 768px) {
-            :root { --deco-size: 80pt; }
+            :root { --deco-size: 52pt; }
         }
         .deco {
             display: block;
@@ -121,14 +121,34 @@
             user-select: none;
             -webkit-user-drag: none;
             will-change: transform;
-            /* 漂浮動畫：上下各 3pt，10 秒一個循環；各圖用 animation-delay 錯開起始時間 */
-            animation: decoFloat 10s infinite;
+            /* 獨立錯落浮動動畫：幅度稍大、頻率錯開 */
+            animation: decoFloat 6s ease-in-out infinite;
+        }
+        /* 手機版 06 與 15 圖片保持 36pt 不放大 */
+        @media (max-width: 767px) {
+            .deco-keep-size {
+                width: 36pt !important;
+                height: 36pt !important;
+            }
+        }
+        /* 僅手機版：將圖片 09 與 11 額外往右推移 */
+        @media (max-width: 767px) {
+            .deco-mobile-shift-right {
+                margin-left: 12pt;
+                transform: translateX(8pt);
+            }
         }
         @keyframes decoFloat {
-            0%   { transform: translateY(0);    animation-timing-function: ease-out; }
-            25%  { transform: translateY(-3pt); animation-timing-function: ease-in-out; }
-            75%  { transform: translateY(3pt);  animation-timing-function: ease-in; }
+            0%   { transform: translateY(0); }
+            50%  { transform: translateY(-4pt); }
             100% { transform: translateY(0); }
+        }
+        @media (min-width: 768px) {
+            @keyframes decoFloat {
+                0%   { transform: translateY(0); }
+                50%  { transform: translateY(-6pt); }
+                100% { transform: translateY(0); }
+            }
         }
         /* 單行文字：左圖 + 文字 + 右圖 */
         .deco-line {
@@ -157,7 +177,7 @@
             justify-content: center;
             margin-top: var(--deco-gap);
         }
-        /* 導覽列正中央 */
+        /* 導覽列正中央裝飾圖 (電腦版置中，手機版靠左緊鄰 G & K) */
         .deco-nav-center {
             position: absolute;
             left: 50%;
@@ -165,23 +185,15 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
-        /* 圖片 07（導覽列正中央）：手機版與桌機版都是 30pt，導覽列維持原本高度 */
-        .deco-nav-center .deco {
-            width: 30pt;
-            height: 30pt;
-        }
-        /* 手機版封面：姓名文字疊在照片上，圖片 15、06 不佔列高，
-           這樣文字位置維持原樣，不會被往上推到照片中的人物與桌面物品上 */
-        div.absolute.inset-0 h1.deco-line .deco { margin-block: -20pt; }
-        /* 窄螢幕（寬度 360px 以下）：圖片 07 改放在 Logo 與連結之間的空白處正中央，避免碰到文字 */
-        @media (max-width: 360px) {
+        @media (max-width: 767px) {
             .deco-nav-center {
                 position: static;
                 transform: none;
-                flex: 1 1 auto;
-                display: flex;
-                justify-content: center;
             }
+        }
+        /* 極窄螢幕（寬度 340px 以下）：縮小導覽列兩個連結的間距，避免圖片 07 碰到文字 */
+        @media (max-width: 339px) {
+            nav .space-x-6 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem !important; }
         }
 
         /* ===== Spell Cast Count 全球魔法累計表 ===== */
@@ -214,12 +226,14 @@
     <!-- 頂端固定毛玻璃導覽列 -->
     <nav class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
         <div class="relative max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#" class="font-cormorant text-2xl font-bold tracking-widest text-morandi-warm">
-                G & K
-            </a>
-            <!-- 圖片 07：導覽列兩段文字中間、網頁正中央 -->
-            <div class="deco-nav-center">
-                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/07.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-8.82s;">
+            <div class="flex items-center space-x-2">
+                <!-- 圖片 07：手機版在最左側，電腦版保持正中央 -->
+                <div class="deco-nav-center">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/07.png" alt="" aria-hidden="true" decoding="async" style="animation-duration: 5.4s; animation-delay: -1.2s;">
+                </div>
+                <a href="#" class="font-cormorant text-2xl font-bold tracking-widest text-morandi-warm">
+                    G & K
+                </a>
             </div>
             <div class="flex space-x-6 text-xs md:text-sm tracking-widest font-medium">
                 <a href="#details" class="hover:text-morandi-warm transition-colors duration-200 py-1">證婚儀式</a>
@@ -236,9 +250,9 @@
             <div class="hidden md:flex flex-col items-center justify-center text-center text-morandi-text z-10 px-4 py-12 animate-fade-in w-full">
                 <p class="font-cormorant italic text-2xl tracking-widest mb-3 text-morandi-warm font-bold">Wedding Invitation</p>
                 <h1 class="deco-line text-4xl lg:text-5xl font-bold tracking-wider mb-4 font-serif text-morandi-text">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-1.76s;">
+                    <img class="deco deco-keep-size" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-duration: 6.8s; animation-delay: -3.5s;">
                     <span>黃國誠 <span class="font-cormorant font-light mx-2 text-morandi-warm no-underline">&amp;</span> 李冠瑩</span>
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-4.71s;">
+                    <img class="deco deco-keep-size" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-duration: 5.9s; animation-delay: -0.8s;">
                 </h1>
                 <p class="text-base tracking-widest max-w-md mx-auto leading-relaxed font-bold text-morandi-text">
                     邀請您見證我們的重要時刻
@@ -262,9 +276,9 @@
             <div class="flex md:hidden absolute inset-0 flex-col items-center justify-end text-center text-morandi-text z-10 px-4 pb-20 animate-fade-in">
                 <p class="font-cormorant italic text-lg tracking-widest mb-2 text-morandi-warm font-bold">Wedding Invitation</p>
                 <h1 class="deco-line text-2xl font-bold tracking-wider mb-3 font-serif text-morandi-text">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-1.76s;">
+                    <img class="deco deco-keep-size" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/15.png" alt="" aria-hidden="true" decoding="async" style="animation-duration: 6.8s; animation-delay: -3.5s;">
                     <span>黃國誠 <span class="font-cormorant font-light mx-2 text-morandi-warm no-underline">&amp;</span> 李冠瑩</span>
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-delay:-4.71s;">
+                    <img class="deco deco-keep-size" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/06.png" alt="" aria-hidden="true" decoding="async" style="animation-duration: 5.9s; animation-delay: -0.8s;">
                 </h1>
                 <p class="text-xs tracking-widest text-morandi-text max-w-md mx-auto leading-relaxed font-bold">
                     邀請您見證我們的重要時刻
@@ -285,9 +299,9 @@
     <section class="py-16 px-4 bg-morandi-bg">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="deco-line font-cormorant text-2xl md:text-3xl tracking-widest text-morandi-warm uppercase mb-8">
-                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/02.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-8.24s;">
+                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/02.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.3s; animation-delay: -4.1s;">
                 <span>Countdown</span>
-                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/10.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-1.18s;">
+                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/10.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 5.6s; animation-delay: -2.3s;">
             </h2>
 
             <!-- 獨立白色微光卡片倒數器 -->
@@ -333,13 +347,13 @@
         <div class="max-w-2xl mx-auto text-center space-y-6">
             <p class="text-sm md:text-base text-morandi-text leading-relaxed tracking-wider">
                 <span class="deco-line">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/12.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-9.41s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/12.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 7.2s; animation-delay: -5.0s;">
                     <span>親愛的朋友們</span>
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/14.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-7.65s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/14.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.0s; animation-delay: -1.7s;">
                 </span><br>
                 很開心可以正式跟大家宣布：<br>
                 我們要結婚了！<br><br>
-                一直以來，許多重要的時刻，身邊都有你們的陪伴。<br>
+                一路走來，很幸運能遇見你們這群朋友。<br>
                 在這個特別的日子裡，也希望能邀請你們一起來，見證我們人生中的下一個篇章。
             </p>
         </div>
@@ -350,12 +364,12 @@
         <div class="max-w-3xl mx-auto">
             <div class="text-center mb-12">
                 <div class="deco-group">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/13.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-3.53s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/13.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 5.7s; animation-delay: -2.9s;">
                     <div>
                         <p class="font-cormorant text-sm uppercase tracking-widest text-morandi-sage">Wedding Information</p>
                         <h2 class="text-2xl md:text-3xl font-bold text-morandi-text mt-1">證婚儀式</h2>
                     </div>
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/05.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-0.59s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/05.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.5s; animation-delay: -0.4s;">
                 </div>
                 <div class="w-12 h-0.5 bg-morandi-warm mx-auto mt-4"></div>
             </div>
@@ -371,7 +385,7 @@
                         <div>
                             <div class="deco-right-wide">
                                 <h4 class="font-bold text-morandi-text text-base">日期與時間</h4>
-                                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/09.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-7.06s;">
+                                <img class="deco deco-mobile-shift-right" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/09.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.1s; animation-delay: -4.5s;">
                             </div>
                             <p class="text-xs text-morandi-muted mt-1 font-bold">2027 年 1 月 23 日 (星期六)</p>
                             <p class="text-xs text-morandi-warm font-medium mt-1">
@@ -390,7 +404,7 @@
                         <div>
                             <div class="deco-right-wide">
                                 <h4 class="font-bold text-morandi-text text-base">儀式地點</h4>
-                                <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/11.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-5.29s;">
+                                <img class="deco deco-mobile-shift-right" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/11.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 5.5s; animation-delay: -1.9s;">
                             </div>
                             <p class="text-xs text-morandi-muted mt-1 font-semibold">
                                 <a href="https://maps.app.goo.gl/CHjmJdgvqbwuyFBTA" target="_blank" rel="noopener noreferrer" class="hover:text-morandi-warm underline underline-offset-2 transition-colors">
@@ -484,11 +498,11 @@
                         </div>
                         <div class="pt-2 border-t border-morandi-warm/10 text-morandi-warmDark font-bold leading-relaxed">
                             <i class="fa-solid fa-building-user mr-1 text-morandi-warm"></i>
-                            抵達地點後，請搭電梯至 13 樓飯店大廳，依櫃台指示轉搭專用電梯至 16 樓天際高空花園。
+                            抵達地點後，請搭電梯至 13 樓飯店大廳，依指示轉搭專用電梯至 16 樓天際高空花園。
                         </div>
                         <!-- 圖片 01：上方文字的中央正下方 20pt -->
                         <div class="deco-below" style="margin-top:20pt;">
-                            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/01.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-4.12s;">
+                            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/01.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.7s; animation-delay: -3.1s;">
                         </div>
                     </div>
                 </div>
@@ -501,12 +515,12 @@
         <div class="max-w-2xl mx-auto">
             <div class="text-center mb-10">
                 <div class="deco-group">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/04.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-6.47s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/04.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 5.8s; animation-delay: -2.0s;">
                     <div>
                         <h2 class="text-2xl md:text-3xl font-bold text-morandi-text mt-1">出席回函</h2>
                         <p class="text-xs text-morandi-muted mt-2">請於 2026 年 12 月 1 日前填寫完成</p>
                     </div>
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/16.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-5.88s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/16.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.9s; animation-delay: -4.8s;">
                 </div>
                 <div class="w-12 h-0.5 bg-morandi-warm mx-auto mt-4"></div>
             </div>
@@ -567,9 +581,9 @@
                     送出回函
                 </button>
 
-                <!-- 圖片 03：送出回函按鈕的中央正下方 20pt -->
+                <!-- 裝飾小圖：原 03 位置改為 17.png -->
                 <div class="deco-below" style="margin-top:20pt;">
-                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/03.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-2.35s;">
+                    <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/17.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.2s; animation-delay: -1.5s;">
                 </div>
             </form>
 
@@ -597,10 +611,11 @@
             <span class="font-cormorant uppercase tracking-widest text-morandi-muted mt-2" style="font-size:10pt;">Spell Cast Count</span>
         </div>
 
+        <!-- 頁尾圖示對調：左側原 17 改為 08.png；右側原 08 改為 03.png -->
         <p class="deco-line font-cormorant text-lg tracking-widest text-morandi-warm mb-1">
-            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/17.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:0s;">
+            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/08.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 5.6s; animation-delay: -3.8s;">
             <span>Guocheng & Kuanying</span>
-            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/08.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-delay:-2.94s;">
+            <img class="deco" src="https://raw.githubusercontent.com/yorick14129/magic-yaya/main/03.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style="animation-duration: 6.6s; animation-delay: -0.3s;">
         </p>
         <p>2027.01.23 • Wedding Day</p>
     </footer>
@@ -708,15 +723,17 @@
                     this.size = isSparkle ? (Math.random() * 2.5 + 1.5) : (Math.random() * 1.8 + 0.8);
                     this.color = goldColors[Math.floor(Math.random() * goldColors.length)];
                     this.alpha = 1;
-                    this.decay = Math.random() * 0.015 + 0.012; // 緩慢自然優雅淡出
+                    this.decay = Math.random() * 0.015 + 0.012; // 預設緩慢淡出
                     this.vx = (Math.random() - 0.5) * 0.8;
                     this.vy = (Math.random() - 0.5) * 0.8 - 0.2;
+                    this.gravity = 0; // 重力加速度
                     this.rotation = Math.random() * Math.PI;
                     this.rotSpeed = (Math.random() - 0.5) * 0.05;
                 }
 
                 update() {
                     this.x += this.vx;
+                    this.vy += this.gravity; // 微小重力帶出流星落體感
                     this.y += this.vy;
                     this.rotation += this.rotSpeed;
                     this.alpha -= this.decay;
@@ -815,10 +832,11 @@
                     for (let i = 0; i < count; i++) {
                         const p = new MagicParticle(centerX, centerY, i % 2 === 0);
                         const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.4 - 0.2);
-                        const speed = Math.random() * 6.5 + 1.5; // 多層次擴散速度
+                        const speed = Math.random() * 5.0 + 1.2; // 溫潤廣域擴散
                         p.vx = Math.cos(angle) * speed;
-                        p.vy = Math.sin(angle) * speed;
-                        p.decay = Math.random() * 0.008 + 0.005; // 極致細膩長時間飄逸淡出
+                        p.vy = Math.sin(angle) * speed - 0.5; // 初速度微朝上飄
+                        p.gravity = Math.random() * 0.015 + 0.008; // 輕盈的微重力降落效果
+                        p.decay = Math.random() * 0.003 + 0.002; // decay 降至 0.002~0.005，極致流暢長效淡出
                         p.size = i % 2 === 0 ? (Math.random() * 2.8 + 1.2) : (Math.random() * 1.5 + 0.6); // 細碎精緻
                         particles.push(p);
                     }
@@ -845,9 +863,7 @@
     <script>
         (function () {
             // ====== 設定 ======
-            // 貼上你的 Firebase Realtime Database 網址（結尾不要加斜線），例如：
-            //   https://your-project-default-rtdb.firebaseio.com
-            //   https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
+            // Firebase Realtime Database 網址（結尾不要加斜線）
             const DB_URL = 'https://magic-spell-507f5-default-rtdb.asia-southeast1.firebasedatabase.app';
             const PATH = '/spellCount.json';
             const MAX = 100000;      // 累計上限
