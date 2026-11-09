@@ -121,13 +121,13 @@
             user-select: none;
             -webkit-user-drag: none;
             will-change: transform;
-            /* 漂浮動畫：上下各 2pt，10 秒一個循環；各圖用 animation-delay 錯開起始時間 */
+            /* 漂浮動畫：上下各 3pt，10 秒一個循環；各圖用 animation-delay 錯開起始時間 */
             animation: decoFloat 10s infinite;
         }
         @keyframes decoFloat {
             0%   { transform: translateY(0);    animation-timing-function: ease-out; }
-            25%  { transform: translateY(-2pt); animation-timing-function: ease-in-out; }
-            75%  { transform: translateY(2pt);  animation-timing-function: ease-in; }
+            25%  { transform: translateY(-3pt); animation-timing-function: ease-in-out; }
+            75%  { transform: translateY(3pt);  animation-timing-function: ease-in; }
             100% { transform: translateY(0); }
         }
         /* 單行文字：左圖 + 文字 + 右圖 */
@@ -165,18 +165,16 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
-        /* 桌機版：圖片 07 為 80pt，導覽列加高才不會讓圖片蓋到下方內容；
-           封面區塊的上方留白與錨點跳轉位置同步調整，讓導覽列不會蓋住文字 */
-        @media (min-width: 768px) {
-            nav > div.relative { height: 120px; }
-            nav + section.pt-16 { padding-top: 121px; }
-            #details, #rsvp { scroll-margin-top: 41px; }
+        /* 圖片 07（導覽列正中央）：手機版與桌機版都是 30pt，導覽列維持原本高度 */
+        .deco-nav-center .deco {
+            width: 30pt;
+            height: 30pt;
         }
         /* 手機版封面：姓名文字疊在照片上，圖片 15、06 不佔列高，
            這樣文字位置維持原樣，不會被往上推到照片中的人物與桌面物品上 */
         div.absolute.inset-0 h1.deco-line .deco { margin-block: -20pt; }
-        /* 窄螢幕（寬度 370px 以下）：圖片 07 改放在 Logo 與連結之間的空白處正中央，避免碰到文字 */
-        @media (max-width: 370px) {
+        /* 窄螢幕（寬度 360px 以下）：圖片 07 改放在 Logo 與連結之間的空白處正中央，避免碰到文字 */
+        @media (max-width: 360px) {
             .deco-nav-center {
                 position: static;
                 transform: none;
